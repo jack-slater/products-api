@@ -93,7 +93,7 @@ func TestFetchProduct(t *testing.T) {
 	clearTable()
 	addProducts(1)
 
-	req, _ := http.NewRequest("GET", "/product", nil)
+	req, _ := http.NewRequest("GET", "/product/1", nil)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)

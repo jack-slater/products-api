@@ -35,6 +35,7 @@ func (a *App) Run(addr string) {
 
 func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/product/{id:[0-9]+}", a.getProduct).Methods("GET")
+	a.Router.HandleFunc("/products", a.getProducts).Methods("GET")
 }
 
 func (a *App) getProduct(writer http.ResponseWriter, req *http.Request) {
@@ -54,6 +55,27 @@ func (a *App) getProduct(writer http.ResponseWriter, req *http.Request) {
 		return	}
 
 	respondWithJson(writer, http.StatusOK, p)
+}
+
+func (a *App) getProducts(writer http.ResponseWriter, req *http.Request) {
+	count, _ := strconv.Atoi(req.FormValue("count"))
+	start, _ := strconv.Atoi(req.FormValue("start"))
+
+	if count > 10 || count < 1 {
+		count = 10
+	}
+
+	if start < 0 {
+		start = 0
+	}
+
+	products, err := getProducts(a.DB, start, count)
+	if err != nil {
+		respondWithError(writer, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJson(writer, http.StatusOK, products)
 }
 
 func respondWithError(writer http.ResponseWriter, code int, message string  ) {
