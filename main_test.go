@@ -50,10 +50,10 @@ func TestEmptyTable(t *testing.T) {
 func TestGetNonExistingProduct(t *testing.T) {
 	clearTable()
 
-	req, _ := http.NewRequest("GET", "/products/11", nil)
+	req, _ := http.NewRequest("GET", "/product/11", nil)
 	response := executeRequest(req)
 
-	checkResponseCode(t, http.StatusOK, response.Code)
+	checkResponseCode(t, http.StatusNotFound, response.Code)
 
 	var m map[string]string
 	json.Unmarshal(response.Body.Bytes(), &m)
@@ -67,7 +67,7 @@ func TestCreateProduct(t *testing.T) {
 
 	payload := []byte(`{"name":"test product","price":11.22}`)
 
-	req, _ := http.NewRequest("POST", "/products", bytes.NewBuffer(payload))
+	req, _ := http.NewRequest("POST", "/product", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
@@ -93,7 +93,7 @@ func TestFetchProduct(t *testing.T) {
 	clearTable()
 	addProducts(1)
 
-	req, _ := http.NewRequest("GET", "/products", nil)
+	req, _ := http.NewRequest("GET", "/product", nil)
 	response := executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)
@@ -104,7 +104,7 @@ func TestUpdateProduct(t *testing.T) {
 	clearTable()
 	addProducts(1)
 
-	req, _ := http.NewRequest("GET", "/products", nil)
+	req, _ := http.NewRequest("GET", "/product", nil)
 	response := executeRequest(req)
 
 	var originalProduct map[string]interface{}
@@ -112,7 +112,7 @@ func TestUpdateProduct(t *testing.T) {
 
 	payload := []byte(`{"name":"test product - updated name","price":11.22}`)
 
-	req, _ = http.NewRequest("PUT", "/products/1", bytes.NewBuffer(payload))
+	req, _ = http.NewRequest("PUT", "/product/1", bytes.NewBuffer(payload))
 	response = executeRequest(req)
 
 	checkResponseCode(t, http.StatusOK, response.Code)

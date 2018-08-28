@@ -11,19 +11,19 @@ type product struct {
 }
 
 func (p *product) getProduct(db *sql.DB) error {
-	return db.QueryRow("SELECT * FROM products WHERE id=$s",
+	return db.QueryRow("SELECT * FROM products WHERE id=$1",
 		p.ID).Scan(&p.Name, &p.Price)
 }
 
 func (p *product) updateProduct(db *sql.DB) error {
-	_, err := db.Exec("UPDATE products SET name=$s price=$s WHERE id=$s",
+	_, err := db.Exec("UPDATE products SET name=$1 price=$2 WHERE id=$3",
 		p.Name, p.Price, p.ID)
 
 	return err
 }
 
 func (p *product) deleteProduct(db *sql.DB) error {
-	_, err := db.Exec("DELETE FROM products WHERE id=$s",
+	_, err := db.Exec("DELETE FROM products WHERE id=$1",
 		p.ID)
 
 	return err
