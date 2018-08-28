@@ -38,6 +38,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/product/{id:[0-9]+}", a.getProduct).Methods("GET")
 	a.Router.HandleFunc("/product", a.createProduct).Methods("POST")
 	a.Router.HandleFunc("/product/{id:[0-9]+}", a.updateProduct).Methods("PUT")
+	a.Router.HandleFunc("/product/{id:[0-9]+}", a.deleteProduct).Methods("DELETE")
 }
 
 func (a *App) getProduct(writer http.ResponseWriter, req *http.Request) {
@@ -122,6 +123,25 @@ func (a *App) updateProduct(writer http.ResponseWriter, req *http.Request) {
 		respondWithError(writer, http.StatusInternalServerError, err.Error())
 		return
 	}
+
+	respondWithJson(writer, http.StatusOK, product)
+}
+
+func (a *App) deleteProduct(writer http.ResponseWriter, req *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(req)["id"])
+	if err != nil {
+		respondWithError(writer, http.StatusBadRequest, "Invalid Product Id")
+	}
+
+	product := product{ID: id}
+	if err := product.deleteProduct(a.DB); err != nil {
+		switch err {
+		case sql.ErrNoRows:
+			respondWithError(writer, http.StatusNotFound, "Product not found")
+		default:
+			respondWithError(writer, http.StatusInternalServerError, err.Error())
+		}
+		return	}
 
 	respondWithJson(writer, http.StatusOK, product)
 }
