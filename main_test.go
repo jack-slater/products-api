@@ -70,7 +70,7 @@ func TestCreateProduct(t *testing.T) {
 	req, _ := http.NewRequest("POST", "/product", bytes.NewBuffer(payload))
 	response := executeRequest(req)
 
-	checkResponseCode(t, http.StatusOK, response.Code)
+	checkResponseCode(t, http.StatusCreated, response.Code)
 
 	var m map[string]interface{}
 	json.Unmarshal(response.Body.Bytes(), &m)
