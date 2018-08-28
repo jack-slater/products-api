@@ -37,6 +37,7 @@ func (a *App) initializeRoutes() {
 	a.Router.HandleFunc("/products", a.getProducts).Methods("GET")
 	a.Router.HandleFunc("/product/{id:[0-9]+}", a.getProduct).Methods("GET")
 	a.Router.HandleFunc("/product", a.createProduct).Methods("POST")
+	a.Router.HandleFunc("/product/{id:[0-9]+}", a.updateProduct).Methods("PUT")
 }
 
 func (a *App) getProduct(writer http.ResponseWriter, req *http.Request) {
@@ -97,6 +98,32 @@ func (a *App) createProduct(writer http.ResponseWriter, req *http.Request) {
 	}
 
 	respondWithJson(writer, http.StatusCreated, product)
+}
+
+func (a *App) updateProduct(writer http.ResponseWriter, req *http.Request) {
+	id, err := strconv.Atoi(mux.Vars(req)["id"])
+	if err != nil {
+		respondWithError(writer, http.StatusBadRequest, "Invalid Product Id")
+	}
+
+	var product product
+	decoder := json.NewDecoder(req.Body)
+
+	if err := decoder.Decode(&product); err != nil {
+		respondWithError(writer, http.StatusBadRequest, "Invalid request payload")
+		return
+	}
+
+	defer req.Body.Close()
+	product.ID = id
+
+
+	if err := product.updateProduct(a.DB) ;err != nil {
+		respondWithError(writer, http.StatusInternalServerError, err.Error())
+		return
+	}
+
+	respondWithJson(writer, http.StatusOK, product)
 }
 
 func respondWithError(writer http.ResponseWriter, code int, message string  ) {
